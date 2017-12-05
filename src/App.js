@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import './App.css';
-import Leaderboard from './components/Leaderboard'
+import Players from './components/Players'
 import PickList from './components/PickList'
-import * as firebase from 'firebase';
-import { Menu, Segment, Header, Card, List, Icon, Modal, Button, Form, Message, Image } from 'semantic-ui-react'
-import Logo from "./images/horizontal-logo.svg"
+import { Menu, Segment, Header, Icon, Modal, Button, Form, Message, Image, Table, Dimmer, Loader } from 'semantic-ui-react'
 import Home from './components/Home'
 import Admin from './components/Admin'
 import fb from './fb.js'
 import logo from './images/horizontal-logo.svg'
+import pg from "./images/paragraph.png"
+
+
 
   
 class App extends Component {
@@ -19,7 +20,8 @@ class App extends Component {
       activeItem: 'home',
       logged: false,
       password: "",
-      username: ""
+      username: "",
+      players: []
     }
     this.openModal = this.openModal.bind(this);
   }
@@ -30,10 +32,16 @@ class App extends Component {
         self.setState({logged: true, modalOpen: false});
       }
     })
+    let playersRef = fb.database().ref('picks');
+    
+    playersRef.on('value', function(snapshot) {
+			self.setState({players: snapshot.val(), loaded: true})
+		})
+    
   }
 
   componentWillUnmmount = () => {
-    fb.auth().re
+    
   }
   handleChange = (value) => {
     this.setState({
@@ -73,16 +81,27 @@ class App extends Component {
   }
 
   render() {
+    
     const { activeItem } = this.state  
     let content;
-    if(activeItem === 'home') {
-      content = <Home />
-    } else if (activeItem === 'leaderboard') {
-      content = <Leaderboard />
-    } else if(activeItem === 'picks') {
-      content = <PickList />
-    } else if(this.state.logged && activeItem === 'admin') {
-      content = <Admin />
+    if(!this.state.loaded) {
+      content = <Segment>
+          <Dimmer active inverted>
+              <Loader inverted>Loading</Loader>
+          </Dimmer>
+
+          <Image src={pg} />
+          </Segment>
+    } else {
+      if(activeItem === 'home') {
+        content = <Home players={this.state.players} />
+      } else if (activeItem === 'Players') {
+        content = <Players logged={this.state.logged} players={this.state.players} />
+      } else if(activeItem === 'picks') {
+        content = <PickList players={this.state.players} />
+      } else if(this.state.logged && activeItem === 'admin') {
+        content = <Admin />
+      }
     }
     return (
       <div style={{maxWidth: "1200px", margin: "auto"}}>
@@ -95,7 +114,7 @@ class App extends Component {
         {/* <Header as='h3' style={{color: "white"}}>Griesers</Header> */}
         </Menu.Item>
         <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
-        <Menu.Item name='leaderboard' active={activeItem === 'leaderboard'} onClick={this.handleItemClick} />
+        <Menu.Item name='Players' active={activeItem === 'Players'} onClick={this.handleItemClick} />
         <Menu.Item name='picks' active={activeItem === 'picks'} onClick={this.handleItemClick} />
         <Menu.Item position='right' active={activeItem === 'admin'} name='setting' onClick={this.openModal}>
           <Icon name='setting' size="large" />

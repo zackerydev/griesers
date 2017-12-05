@@ -20,6 +20,9 @@ export default class Home extends Component {
             self.setState({bowlGames: snapshot.val(), loaded: true})
         })
     }
+    componentWillUnmount = () => {
+        fb.database().ref('games').off();
+    }
     handleChange = (idx, prop, event) => {
         let games;
         if(this.state.bowlGames[idx]) {

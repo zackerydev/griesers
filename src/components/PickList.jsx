@@ -15,22 +15,22 @@ export default class PickList extends Component {
 			message: "",
 			loaded: false,
 			name: "",
-			players: []
+			players: props.players
 		};
 		this.submitPicks = this.submitPicks.bind(this)
 	}
 	componentWillMount = () => {
 		var self = this;
-		let bowlGamesRef = fb.database().ref('games');
-		let playersRef = fb.database().ref('picks');
-
+		let bowlGamesRef = fb.database().ref('games')
         bowlGamesRef.on('value', function(snapshot) {
 			self.setState({bowlGames: snapshot.val(), loaded: true})
 		})
 		
-		playersRef.on('value', function(snapshot) {
-			self.setState({players: snapshot.val()})
-		})
+
+	}
+
+	componentWillUnmount = () => {
+		fb.database().ref('games').off()
 	}
 	handleChange = (idx, value, e) => {
 		let picks = this.state.picks;
@@ -42,8 +42,13 @@ export default class PickList extends Component {
 		this.setState({name: e.target.value});
 	}
 	submitPicks = (e) => {
+		document.body.scrollTop = document.documentElement.scrollTop = 0;
 		var self = this
 		let valid = true;
+		if(this.state.name === "") {
+			valid = false;
+			this.setState({error: true, message: "Please enter a name!"})
+		}
 		for(var i = 0; i < this.state.players.length; i++ ){
 			if(this.state.name === this.state.players[i].name) {
 				this.setState({error: true, message: "Name already exists!"})
@@ -73,7 +78,8 @@ export default class PickList extends Component {
 			newPicks.push({
 				name: this.state.name,
 				picks: this.state.picks,
-				points: 0
+				points: 0,
+				paid: false
 			});
 			fb.database().ref('picks').set(newPicks, function(err) {
 				if(err) {
@@ -140,7 +146,7 @@ export default class PickList extends Component {
                 <Card.Content>
 				{status}
 				<Form>
-				<Form.Input onChange={(e) => this.handleName(e)} label='Your Name' placeholder={"Clark Griswald"} />
+				<Form.Input onChange={(e) => this.handleName(e)} label='Your Name' placeholder={"Clark Griswold"} />
 				</Form>
 				<Table basic='very'>
 				<Table.Header>
