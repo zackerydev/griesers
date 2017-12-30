@@ -10,7 +10,7 @@ import logo from './images/horizontal-logo.svg'
 import pg from "./images/paragraph.png"
 
 
-  
+
 class App extends Component {
   constructor() {
     super()
@@ -59,11 +59,11 @@ class App extends Component {
         })
       })
 		})
-    
+
   }
 
   componentWillUnmmount = () => {
-    
+
   }
   handleChange = (value) => {
     this.setState({
@@ -103,8 +103,8 @@ class App extends Component {
   }
 
   render() {
-    
-    const { activeItem } = this.state  
+
+    const { activeItem } = this.state
     let content;
     if(!this.state.loaded) {
       content = <Segment>
@@ -117,8 +117,8 @@ class App extends Component {
     } else {
       if(activeItem === 'home') {
         content = <Home players={this.state.players} games={this.state.games} winners={this.state.winners} />
-      } else if (activeItem === 'Players') {
-        content = <Players logged={this.state.logged} players={this.state.players} />
+      } else if (activeItem === 'Games') {
+        content = <Players logged={this.state.logged} games={this.state.games} winners={this.state.winners} players={this.state.players} />
       } else if(activeItem === 'picks') {
         content = <PickList players={this.state.players} games={this.state.games} />
       } else if(this.state.logged && activeItem === 'admin') {
@@ -127,16 +127,16 @@ class App extends Component {
     }
     return (
       <div style={{maxWidth: "1200px", margin: "auto"}}>
-      
+
       <Segment inverted>
-      
+
       <Menu inverted pointing secondary stackable size="large">
         <Menu.Item>
         <Image  src={logo}  alt="logo"/>
         {/* <Header as='h3' style={{color: "white"}}>Griesers</Header> */}
         </Menu.Item>
         <Menu.Item name='home' active={activeItem === 'home'} onClick={this.handleItemClick} />
-        <Menu.Item name='Players' active={activeItem === 'Players'} onClick={this.handleItemClick} />
+        <Menu.Item name='Games' active={activeItem === 'Games'} onClick={this.handleItemClick} />
         <Menu.Item name='picks' active={activeItem === 'picks'} onClick={this.handleItemClick} />
         <Menu.Item position='right' active={activeItem === 'admin'} name='setting' onClick={this.openModal}>
           <Icon name='setting' size="large" />
@@ -161,7 +161,7 @@ class App extends Component {
             content={this.state.message}
           />
           <Form.Input label="Username" onChange={this.handleUser} />
-          <Form.Input label="Password" type="Password" onChange={this.handleChange} /> 
+          <Form.Input label="Password" type="Password" onChange={this.handleChange} />
           </Form>
         </Modal.Content>
         <Modal.Actions>
