@@ -4,6 +4,8 @@ import { Dimmer, Loader, Image, Segment, Table, Message} from 'semantic-ui-react
 import "./css/PickList.css"
 import pg from "../images/paragraph.png"
 import fb from '../fb.js'
+import ReactTable from 'react-table'
+import 'react-table/react-table.css'
 
 export default class PickList extends Component {
 	constructor(props) {
@@ -15,7 +17,8 @@ export default class PickList extends Component {
 			message: "",
 			loaded: false,
 			name: "",
-			players: props.players
+			players: props.players,
+			games: props.games
 		};
 		this.submitPicks = this.submitPicks.bind(this)
 	}
@@ -44,75 +47,36 @@ export default class PickList extends Component {
 	submitPicks = (e) => {
 		document.body.scrollTop = document.documentElement.scrollTop = 0;
 		var self = this
-		let valid = true;
-		if(this.state.name === "") {
-			valid = false;
-			this.setState({error: true, message: "Please enter a name!"})
-		}
-		for(var i = 0; i < this.state.players.length; i++ ){
-			if(this.state.name === this.state.players[i].name) {
-				this.setState({error: true, message: "Name already exists!"})
-				valid = false;
-				break;
-			}
-		}
-		if(valid) {
-			for(var i = 0; i < this.state.picks.length; i++) {
-				if(typeof this.state.picks[i] === "undefined") {
-					valid = false;
-					this.setState({error: true, message: "Make sure you have picked all games!"})
-					break;
-				}
-			}
-		}
-
-		if(valid) {
-			if(this.state.picks.length !== this.state.bowlGames.length) {
-				valid = false;
-				this.setState({error: true, message: "Make sure you have picked all games!"})
-			}
-		}
-			
-		if(valid) {
-			var newPicks = this.state.players;
-			newPicks.push({
-				name: this.state.name,
-				picks: this.state.picks,
-				points: 0,
-				paid: false
-			});
-			fb.database().ref('picks').set(newPicks, function(err) {
-				if(err) {
-                self.setState({error: true, message: err.message});
-            } else {
-                self.setState({success: true, message: "Successfully saved your picks!"})
-            }
-			})
-		}
+		this.setState({error: true, message: "Picking games is closed!"})
 		
 	}
 	render() {
-		const { bowlGames } = this.state
-		const listItems = bowlGames.map((val, idx) => {
+		const { players } = this.state
+		const { games } = this.state
+		const headItems = [{
+			Header: "Name",
+			accessor: 'name'
+		}]
+		for(var i = 0; i < games.length; i++) {
+			headItems.push({
+				Header: games[i].name,
+				accessor: 'picks[' + i + ']',
+			})
+		}
+		const listItems = players.map((val, idx) => {
 			return(
 				<Table.Row key={idx}>
 					<Table.Cell>
 						{val.name}
 					</Table.Cell>
-					<Table.Cell>
-						<input id={idx + "id"} type="radio" className="not"  name={idx.toString()} value={val.favorite} onChange={(e) => this.handleChange(idx, 'favorite', e)} />
-						<label className="special" htmlFor={idx + "id"}> {val.favorite} </label>
-					</Table.Cell>
-					<Table.Cell>
-						{val.favPoints}
-					</Table.Cell>
-					<Table.Cell> 
-						<input type="radio" id={idx + "id2"} className="not"  name={idx.toString()} value={val.underdog} onChange={(e) => this.handleChange(idx, 'underdog', e)} />
-						<label className="special" htmlFor={idx + "id2"}> {val.underdog} </label>
-					</Table.Cell>
-					<Table.Cell>
-						{val.undPoints}
-					</Table.Cell>
+					{
+						val.picks.map((v, idx) => {
+							return(<Table.Cell>
+								{v}
+							</Table.Cell>)
+							
+						})
+					}
 				</Table.Row>
 			)
 		})
@@ -144,26 +108,8 @@ export default class PickList extends Component {
             <Card fluid>
                 <Card.Content header="Make Your Picks!" />
                 <Card.Content>
-				{status}
-				<Form>
-				<Form.Input onChange={(e) => this.handleName(e)} label='Your Name' placeholder={"Clark Griswold"} />
-				</Form>
-				<Table basic='very'>
-				<Table.Header>
-					<Table.Row>
-						<Table.HeaderCell><b>Bowl Game</b></Table.HeaderCell>
-						<Table.HeaderCell><b>Favorite</b></Table.HeaderCell>
-						<Table.HeaderCell><b>Points</b></Table.HeaderCell>
-						<Table.HeaderCell><b>Underdog</b></Table.HeaderCell>
-						<Table.HeaderCell><b>Points</b></Table.HeaderCell>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-                    {listItems}
-				</Table.Body>
-				</Table>
-                <Button color="blue" fluid onClick={this.submitPicks}> Save Your Picks! </Button>
-                </Card.Content>
+				<ReactTable data={this.state.players} columns={headItems}/>
+				</Card.Content>
             </Card>
             
             </Card.Group>

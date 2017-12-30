@@ -10,7 +10,6 @@ import logo from './images/horizontal-logo.svg'
 import pg from "./images/paragraph.png"
 
 
-
   
 class App extends Component {
   constructor() {
@@ -33,9 +32,32 @@ class App extends Component {
       }
     })
     let playersRef = fb.database().ref('picks');
-    
     playersRef.on('value', function(snapshot) {
-			self.setState({players: snapshot.val(), loaded: true})
+      let players = snapshot.val();
+      let winnersRef = fb.database().ref('winners');
+      winnersRef.on('value', function(snapshot) {
+        let winners = snapshot.val();
+        let gamesRef = fb.database().ref('games');
+        gamesRef.on('value', function(snapshot) {
+          var games = snapshot.val()
+          for(var i = 0; i < players.length; i++) {
+            players[i].points = 0;
+              for(var j = 0; j < players[i].picks.length; j++) {
+                  if(players[i].picks[j] === winners[j]) {
+                      var game = games[j];
+                      if(winners[j] === game.favorite) {
+                        players[i].points = parseInt(game.favPoints) + parseInt(players[i].points);
+                      } else if(winners[j] === game.underdog) {
+                        players[i].points = parseInt(game.undPoints) + parseInt(players[i].points);
+                      }
+                  }
+              }
+          }
+
+
+          self.setState({players: players, games: snapshot.val(), winners: winners, loaded: true});
+        })
+      })
 		})
     
   }
@@ -94,11 +116,11 @@ class App extends Component {
           </Segment>
     } else {
       if(activeItem === 'home') {
-        content = <Home players={this.state.players} />
+        content = <Home players={this.state.players} games={this.state.games} winners={this.state.winners} />
       } else if (activeItem === 'Players') {
         content = <Players logged={this.state.logged} players={this.state.players} />
       } else if(activeItem === 'picks') {
-        content = <PickList players={this.state.players} />
+        content = <PickList players={this.state.players} games={this.state.games} />
       } else if(this.state.logged && activeItem === 'admin') {
         content = <Admin />
       }

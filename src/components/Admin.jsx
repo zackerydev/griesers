@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { List, Card, Form, Button, Icon, Message } from 'semantic-ui-react'
-import { Dimmer, Loader, Image, Segment } from 'semantic-ui-react'
+import { Dimmer, Loader, Image, Segment, Divider, Header } from 'semantic-ui-react'
 import pg from "../images/paragraph.png"
 import fb from '../fb'
 
@@ -10,14 +10,20 @@ export default class Home extends Component {
 		this.state = {
             error: false,
             success: false,
-            bowlGames: []
+            bowlGames: [],
+            winners: []
 		};
     }
     componentWillMount = () => {
         var self = this;
         let bowlGamesRef = fb.database().ref('games');
         bowlGamesRef.on('value', function(snapshot) {
-            self.setState({bowlGames: snapshot.val(), loaded: true})
+            let games = snapshot.val();
+            let winnersRef = fb.database().ref('winners');
+            winnersRef.on('value', function(snapshot) {
+                self.setState({bowlGames: games, loaded: true, winners: snapshot.val()})
+            })
+            
         })
     }
     componentWillUnmount = () => {
@@ -65,18 +71,33 @@ export default class Home extends Component {
         this.setState({bowlGames: games})
     }
 
+    setWinner = (idx, team) => {
+        var self = this;
+        let oldWin = this.state.winners;
+        oldWin[idx] = team
+        fb.database().ref('winners').set(oldWin, function(err) {
+            if(err)
+                self.setState({error: true, message: "An error occurred updating winners"})
+            else {
+                self.setState({success: true, message: "Saved winner!"})
+            }
+
+        })
+    }
+
 	render() {
+        let { winners } = this.state
         let listItems = this.state.bowlGames.map((val, idx) => {
                     return(
-                            <Form.Group key={idx}>
-                            <Form.Input onChange={(e) => this.handleChange(idx, "name", e)} label='Bowl Game Name' placeholder={"Bowl Name"} value={val.name} />
-                            <Form.Input onChange={(e) => this.handleChange(idx, "favorite", e)} label='Favorite' placeholder={"Favorite"} value={val.favorite} />
-                            <Form.Input onChange={(e) => this.handleChange(idx, "favPoints", e)} label='Points' placeholder={"Favorite Points"} value={val.favPoints} type="number"/>
-                            <Form.Input onChange={(e) => this.handleChange(idx, "underdog", e)} label='Underdog' placeholder={"Underdog"} value={val.underdog} />
-                            <Form.Input onChange={(e) => this.handleChange(idx, "undPoints", e)} label='Points' placeholder={"Underdog Points"} value={val.undPoints} type="number"/>
-                            <Form.Button label="Add" icon color="green" onClick={(e) => this.addGame(idx)}> <Icon name="plus" /></Form.Button>
-                            <Form.Button label="Remove" icon color="red" onClick={(e) => this.removeGame(idx)}> <Icon name="minus" /></Form.Button>
-                            </Form.Group>
+                        <div>
+                        <Header as='h3'> {val.name} </Header>
+                        <Button.Group fluid>
+                            <Button toggle active={this.state.winners[idx] === val.favorite} onClick={() => this.setWinner(idx, val.favorite)}>{val.favorite} </Button>
+                            <Button toggle active={this.state.winners[idx] === val.underdog} onClick={() => this.setWinner(idx, val.underdog)}> {val.underdog} </Button>
+                        </Button.Group>
+                        <Divider />
+                        </div>
+                        
                     )
                 })
         let status = <div></div>
@@ -105,12 +126,10 @@ export default class Home extends Component {
             content = (<div style={{fontSize: "24px"}}>
 			<Card.Group>
             <Card fluid>
-                <Card.Content header="Insert/Edit Bowl Games" />
+                <Card.Content header="Pick the Bowl Game Winners" />
                 <Card.Content>
                 {status}
-                <Form>
                     {listItems}
-                </Form>
                 <Button color="blue" fluid onClick={this.saveGames}> Save Bowl Games </Button>
                 </Card.Content>
             </Card>

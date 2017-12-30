@@ -1,0 +1,5 @@
+.scrolltb {
+    width: 800px;
+    overflow-x: 'scroll';
+    height: 800px;
+}
