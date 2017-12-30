@@ -17,7 +17,7 @@ export default class Home extends Component {
         super(props);
 
         var sortedPlayers = props.players.sort(compare);
-        
+
 		this.state = {
             players: sortedPlayers
 		};
@@ -43,20 +43,20 @@ export default class Home extends Component {
                 {displayPlace}
             </Table.Cell>
             <Table.Cell>
-                {val.name} 
+                {val.name}
             </Table.Cell>
             <Table.Cell>
-                {val.points} 
+                {val.points}
             </Table.Cell>
             </Table.Row>
             )
             })
 		return (<div style={{fontSize: "24px"}}>
-			
+
             {/* <Card fluid>
                 <Card.Content header="How It Works" />
                 <Card.Content>
-                <p> Once the games go live go to the picks tab above. Enter your name and pick your games. You can pay at the PayPal link below. The players tab 
+                <p> Once the games go live go to the picks tab above. Enter your name and pick your games. You can pay at the PayPal link below. The players tab
                 above will show your payment status once it has been received and processed. <b> Note: </b> Once you make your picks you cannot change them through the site.  </p>
                 <a href="https://paypal.me/pools/c/7ZRJF1scA6">
                 <Button fluid animated="fade" color="blue">
@@ -70,7 +70,9 @@ export default class Home extends Component {
             <Card fluid>
             <Card.Content header="Payout" />
             <Card.Content>
-            <Card.Meta> 47 total entries </Card.Meta>
+              <b> Better late than never: </b> You can go to the 'Games' tab to see how anyone's picks stack up against the winners
+
+            <Card.Meta style={{padding: "10px"}}> 47 total entries </Card.Meta>
             <ol>
             <li> 1st - $235 </li>
             <li> 2nd - $120 </li>
@@ -93,13 +95,13 @@ export default class Home extends Component {
                     </Table.Header>
                     <Table.Body className="tbody">
                     {pList}
-                    </Table.Body>      
+                    </Table.Body>
                 </Table>
                 </Card.Content>
             </Card>
             </Card.Group>
-        
-            
+
+
         </div>)
 	}
 }
