@@ -43,14 +43,22 @@ class App extends Component {
           for(var i = 0; i < players.length; i++) {
             players[i].points = 0;
               for(var j = 0; j < players[i].picks.length; j++) {
-                  if(players[i].picks[j] === winners[j]) {
-                      var game = games[j];
-                      if(winners[j] === game.favorite) {
-                        players[i].points = parseInt(game.favPoints) + parseInt(players[i].points);
-                      } else if(winners[j] === game.underdog) {
-                        players[i].points = parseInt(game.undPoints) + parseInt(players[i].points);
-                      }
+                if(j === players[i].picks.length - 1) {
+                  if(players[i].picks[38] === "Alabama") {
+                    if(players[i].picks[j] === winners[j]) {
+                      players[i].points += 10
+                    }
                   }
+                } else {
+                  if(players[i].picks[j] === winners[j]) {
+                    var game = games[j];
+                    if(winners[j] === game.favorite) {
+                      players[i].points = parseInt(game.favPoints) + parseInt(players[i].points);
+                    } else if(winners[j] === game.underdog) {
+                      players[i].points = parseInt(game.undPoints) + parseInt(players[i].points);
+                    }
+                }
+                }  
               }
           }
 

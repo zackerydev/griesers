@@ -85,6 +85,20 @@ export default class Home extends Component {
         })
     }
 
+    clearWinner = (idx) => {
+        var self = this;
+        let oldWin = this.state.winners;
+        oldWin[idx] = null;
+        fb.database().ref('winners').set(oldWin, function(err) {
+            if(err)
+                self.setState({error: true, message: "An error occurred updating winners"})
+            else {
+                self.setState({success: true, message: "Saved winner!"})
+            }
+
+        })
+    }
+
 	render() {
         let { winners } = this.state
         let listItems = this.state.bowlGames.map((val, idx) => {
@@ -95,6 +109,7 @@ export default class Home extends Component {
                             <Button toggle active={this.state.winners[idx] === val.favorite} onClick={() => this.setWinner(idx, val.favorite)}>{val.favorite} </Button>
                             <Button toggle active={this.state.winners[idx] === val.underdog} onClick={() => this.setWinner(idx, val.underdog)}> {val.underdog} </Button>
                         </Button.Group>
+                        <Button onClick={() => this.clearWinner(idx)}>Clear</Button>
                         <Divider />
                         </div>
                         

@@ -74,11 +74,11 @@ export default class Home extends Component {
 
             <Card.Meta style={{padding: "10px"}}> 47 total entries </Card.Meta>
             <ol>
-            <li> 1st - $235 </li>
-            <li> 2nd - $120 </li>
-            <li> 3rd - $70 </li>
-            <li> 4th - $35 </li>
-            <li> Last - $10 </li>
+            <li> 1st - $235 - <b> Tina Franklin </b> </li>
+            <li> 2nd - $120 - <b> BOSS </b></li>
+            <li> 3rd - $70 - <b> Brian Wilson (Mandi Wilson) </b></li>
+            <li> 4th - $35 - <b> Donna Kletting </b> </li>
+            <li> Last - $10 - <b> KEN GREEN 1 </b> </li>
             </ol>
             </Card.Content>
             </Card>
